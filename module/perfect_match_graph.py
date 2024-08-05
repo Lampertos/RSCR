@@ -5,7 +5,7 @@ from scipy.sparse.csgraph import maximum_bipartite_matching
 from scipy.linalg import schur
 
 
-def approximateTu(Tu, epsilon=0.001, increment=1):
+def approximateTu(Tu, epsilon=0.001, increment=1, n1_flag = False):
     '''
     Tu must be in the block diagonal form
     it will return two orthogonal matrices S and D, S-T should have small norm, D contains all the missing blocks
@@ -71,6 +71,9 @@ def approximateTu(Tu, epsilon=0.001, increment=1):
         print("Warning: potential multiple eigenvalues of 1/-1, n =", n, "flag_p1 =", flag_p1, "flag_m1 =", flag_m1)
     thetas = np.arccos(x)
     theta_min = np.arccos(1 - (epsilon ** 2) / 2)
+
+    # Theoretical upper bound
+    n1 = np.ceil( 2* np.pi * (d + 1) / theta_min)
 
     bigN = n
     graph = []
@@ -154,4 +157,8 @@ def approximateTu(Tu, epsilon=0.001, increment=1):
         row1[(bigN - 1 - n) * 2 + (1 - flag_p1)] = -1
         D.append(row1)
 
-    return (np.array(S), np.array(D), P_pm_one)
+    if n1_flag:
+        print
+        return (np.array(S), np.array(D), P_pm_one, int(n1))
+    else:
+        return (np.array(S), np.array(D), P_pm_one)
