@@ -52,7 +52,9 @@ def give_ts(name, ts_index=1, noise_length=300, n_ts=1, sigma=1):
     elif 'ecl' in name:
         d_raw = pd.read_csv('data_/ECL.csv')
         # Assume ts_index contains column names in this case
-        x_mg = d_raw[ts_index].values
+        x_mg = d_raw['MT_320'].values
+        x_mg = x_mg.reshape(x_mg.shape[0], 1)
+        max_length = x_mg.shape[0]
         start = 0
         ts_index = np.arange(x_mg.shape[1])
     elif 'weather' in name:
@@ -95,8 +97,10 @@ def give_ts(name, ts_index=1, noise_length=300, n_ts=1, sigma=1):
 
     if np.isscalar(ts_index):
         ts_index = np.array([ts_index] * n_ts)
-
-    x_ts[:, :] = x_mg[start: start + noise_length, ts_index]
+    try:
+        x_ts[:, :] = x_mg[start: start + noise_length, ts_index]
+    except:
+        x_ts[:, :] = x_mg[start: start + noise_length]
 
     return x_ts.T, noise_length
 
