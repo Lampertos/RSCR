@@ -2,7 +2,7 @@ import numpy as np
 
 from mpmath import mp
 import torch
-from module.util import spec_radius
+from module.util import spec_radius, binary_pi
 
 if torch.cuda.is_available():
     dev = torch.device("cuda")
@@ -46,23 +46,9 @@ def reservoir(n_res, n_in, **kwargs):
     if win_rand == 1:
         Win = np.random.rand(n_res, n_in)
     else:
-        # Fixed binary expansion of pi
-        mp.dps = n_res + 1
-        text = str(mp.pi)
-        digits = [int(s) for s in text if s != "."]
-
-        perW_list = []
-
-        for i in range(n_res):
-            digit_bin = get_bin(digits[i])
-            tlst = [int(x) for x in str(digit_bin)]
-            perW_list = perW_list + tlst
-
-        perW = np.array(perW_list)[:n_res].reshape(n_res, 1)
-
-        Win = (Win * 2) - 1
-        Win = np.multiply(Win, perW)
-
+        V = binary_pi(n_res)[:n_res] * 2 - 1
+        V = V[:n_res]
+        Win = V
     Win *= rin
 
 

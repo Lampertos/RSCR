@@ -3,6 +3,7 @@ import math
 import time
 from scipy.linalg import block_diag, schur
 from numpy import linalg as LA
+import mpmath as mp
 
 
 def round_up_to_even(f):
@@ -170,3 +171,28 @@ def rot_angles(A, _check=False, _schur=True, timer=False, single_angle = False, 
         return angle_list
     else:
         return np.array(list(dict.fromkeys(angle_list)))
+
+
+def binary_pi(n_digits):
+    """
+    Binary expansion of pi, align with https://oeis.org/A004601
+    """
+    mp.dps = int(n_digits * 3.32) + 10  # Set decimal places needed for binary precision
+
+    # Integer Part
+    integer_part = int(mp.pi)
+    binary_integer_part = [int(bit) for bit in bin(integer_part)[2:]]  # Convert to list of integers
+
+    # Fraction part
+    binary_fractional_part = []
+    fractional_part = mp.pi - integer_part
+
+    for _ in range(n_digits):
+        fractional_part *= 2
+        digit = int(fractional_part)
+        binary_fractional_part.append(digit)
+        fractional_part -= digit
+
+    # Combine together
+    binary_combined = np.array(binary_integer_part + binary_fractional_part, dtype=int)
+    return binary_combined
